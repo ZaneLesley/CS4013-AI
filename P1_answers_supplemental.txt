@@ -5,19 +5,19 @@ Question 1.1: What data structure do you use for implementing DFS? Why?
 A1.1: DFS uses a stack structure due to its last in first out (LIFO) strategy of prioritizing nodes which increase depth over those that do not. When expanding a node, these nodes appear at the top of the stack as the most-recently inserted objects. Hence, a stack is the best choice for DFS.
 
 Question 1.2:The Pacman board will show an overlay of the states explored, and the order in which they were explored (brighter red means earlier exploration). Is the exploration order what you would have expected? Does Pacman actually go to all the explored squares on his way to the goal?
-A1.2: The exploration order is roughly what I would have expected, though there were a couple points in the first and second mazes where Pacman took paths I didn't expect him to. Nevertheless, he expectedly misses much of the bigger mazes while finding his way to the goal. This is just the nature of DFS, and didn't surprise me much.
+A1.2: The exploration order is roughly what we would have expected, though there were a couple points in the first and second mazes where Pacman took paths we didn't expect him to. Nevertheless, he expectedly misses much of the bigger mazes while finding his way to the goal. This is just the nature of DFS, and didn't surprise us much.
 
 Question 2.1: What data structure do you use for implementing BFS? Why?
 A2.1: BFS uses a queue structure due to its first in first out (FIFO) strategy of prioritizing nodes to expand at the same depth before moving to deeper nodes. With a queue, the oldest inserted objects closest to the most recently expanded nodes are prioritized first, which makes it a perfect structure for BFS.
 
 Question 3.1: What cost function did you implement?  Please briefly describe how your cost function is designed (what factors does it consider and how heavy of a weight has each factor considered been given?)
-A3.1: I implemented a cost function that counts the cumulative cost from the start node to the goal node. It's built around PriorityQueue, which is a queue that also includes a field for each entry detailing the priority said entry has. At each iteration of the loop, the cumulative cost of the path to the current internal node and the path of each new frontier node is calculated, which is stored in each frontier node. This is all taken care of at the end of an iteration, but at the beginning of the next iteration, the priority queue automatically selects the lowest priority node to be popped next. With UCS lacking any usage of heuristics, there's no need to give any weights to the cost.
+A3.1: We implemented a cost function that counts the cumulative cost from the start node to the goal node. It's built around PriorityQueue, which is a queue that also includes a field for each entry detailing the priority said entry has. At each iteration of the loop, the cumulative cost of the path to the current internal node and the path of each new frontier node is calculated, which is stored in each frontier node. This is all taken care of at the end of an iteration, but at the beginning of the next iteration, the priority queue automatically selects the lowest priority node to be popped next. With UCS lacking any usage of heuristics, there's no need to give any weights to the cost.
 
-Question 4.1: What is the difference between the nullHeuristic  and the Manhattan distance heuristic? Does nullHeuristic give the optimal solution?  Why is the Manhattan distance heuristic better?
-A4.1: 
+Question 4.1: What is the difference between the nullHeuristic and the Manhattan distance heuristic? Does nullHeuristic give the optimal solution?  Why is the Manhattan distance heuristic better?
+A4.1: nullHeuristic always returns zero, essentially implying that every node is equal in distance from the goal and thus being the same as UCS for all intents and purposes. On the other hand, the Manhattan distance is the combination of the horizontal and vertical distances of a node from the goal. nullHeuristic DOES give an optimal solution by way of being UCS, but the Manhattan distance is a better heuristic because it can propel the efficiency of its search forward using knowledge about the state space instead of arbitrary zeroes.
 
 Question 4.2: What happens on openMaze for the various search strategies?
-A4.2: 
+A4.2: DFS exhaustively combs through the maze horizontally row by row before eventually finding the solution. BFS hugs corners and generally finds the solution much faster than BFS. UCS and A* both turn around corners at optimal times to find the solution at the same time as one another but collectively faster than DFS or BFS.
 
 Question 5.1: What states representation do you choose in this problem?
 A5.1: 
