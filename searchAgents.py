@@ -326,7 +326,8 @@ class CornersProblem(search.SearchProblem):
             #   hitsWall = self.walls[nextx][nexty]
 
             "*** YOUR CODE HERE ***"
-
+            
+            
         self._expanded += 1 # DO NOT CHANGE
         return successors
 
