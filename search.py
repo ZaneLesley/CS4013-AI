@@ -72,68 +72,6 @@ def tinyMazeSearch(problem):
     w = Directions.WEST
     return  [s, s, w, s, w, w, s, w]
 
-def nullHeuristic(state, problem=None):
-    """
-    A heuristic function estimates the cost from the current state to the nearest
-    goal in the provided SearchProblem.  This heuristic is trivial.
-    """
-    return 0
-
-def chooseSearch(choice=0, problem=SearchProblem, heuristic=nullHeuristic):
-
-    """This implementation relies entirely on chooseSearch to generically handle redundant lines
-        of code common between each search algorithm while dynamically choosing specific operations
-        based on the search algorithm the function is called with. This is accomplished using a blend
-        of if-else statements and ternary operators (which are essentially inline if-else shortcuts). 
-        The general path this function takes is equivalent to the lecture pseudocode for search tree 
-        algorithms."""
-
-    "initialize set (unique objects) for internal nodes and data structure for expandable nodes"
-    internal = set()
-    frontier = (util.Stack() if choice == 0 else
-                util.Queue() if choice == 1 else
-                util.PriorityQueue() if choice == 2 or choice == 3 else
-                util.Stack())
-    "initialize the search graph using the initial state of problem"
-    if choice == 2 or choice == 3:
-        frontier.push((problem.getStartState(), [], 0), 0)
-    else:
-        frontier.push((problem.getStartState(), []))
-    "graph-search(problem, strategy) returns a solution, or failure"
-    while not frontier.isEmpty():
-        "choose a frontier node for expansion according to strategy"
-        pos = frontier.pop()
-        node = pos[0]
-        path = pos[1]
-        prio = (pos[2] if choice == 2 or choice == 3 else
-                0)
-        
-        "if the node contains a goal state then return the corresponding solution"
-        if problem.isGoalState(node):
-            return path
-        "else expand the node and add the resulting nodes to the search tree"
-        if node not in internal:
-            internal.add(node)
-            for newfrontier in problem.getSuccessors(node):
-                if newfrontier not in internal:
-                    nfnode = newfrontier[0]
-                    cpath = path + [newfrontier[1]]
-                    cprio = ((newfrontier[2] + prio) if choice == 2 or choice == 3 else
-                            0)
-                    if choice == 2:
-                        frontier.push((nfnode, cpath, cprio), cprio)
-                    elif choice == 3:
-                        print(heuristic(nfnode, problem))
-                        frontier.push((nfnode, cpath, cprio), cprio + heuristic(nfnode, problem))
-                    else:
-                        frontier.push((nfnode, cpath))
-    "if there are no candidates for expansion then return failure"
-    print("Failure! Search could not find a goal!")
-    return[]
-        
-    
-    
-
 def depthFirstSearch(problem: SearchProblem):
     """
     Search the deepest nodes in the search tree first.
@@ -150,30 +88,159 @@ def depthFirstSearch(problem: SearchProblem):
     """
     "*** YOUR CODE HERE ***"
     
-    # call chooseSearch to perform DFS, return the path
-    return(chooseSearch(0, problem, None))
+    "initialize stack (LIFO) for expandable nodes and set (unique objects) for internal nodes"
+    frontier = util.Stack()
+    internal = []
+    "initialize the search graph using the initial state of problem"
+    frontier.push((problem.getStartState(), []))
+    "graph-search(problem, strategy) returns a solution, or failure"
+    while not frontier.isEmpty():
+        "choose a frontier node for expansion according to strategy"
+        pos = frontier.pop()
+        node = pos[0]
+        path = pos[1]
+        "if the node contains a goal state then return the corresponding solution"
+        if problem.isGoalState(node):
+            return path
+        "else expand the node and add the resulting nodes to the search tree"
+        if node not in internal:
+            internal.append(node)
+            # get each new frontier node and push them onto the stack as a tuple of the node and path to said node
+            for newfrontier in problem.getSuccessors(node):
+                if newfrontier not in internal:
+                    nfnode = newfrontier[0]
+                    cpath = path + [newfrontier[1]]
+                    frontier.push((nfnode, cpath))
+    "if there are no candidates for expansion then return failure"
+    print("Failure! DFS could not find a goal!")
+    return[]
     
 
 def breadthFirstSearch(problem: SearchProblem):
     """Search the shallowest nodes in the search tree first."""
     "*** YOUR CODE HERE ***"
 
-    # call chooseSearch to perform BFS, return the path
-    return(chooseSearch(1, problem, None))
+    """There is quite literally a single difference between this code for BFS and and the Q1 code for DFS,
+       and that is the change from a stack to a queue for the data structure of frontier. Every other line
+       of code is exactly the same but seems to be able to pass all tests for Q2."""
+
+    "initialize stack (LIFO) for expandable nodes and set (unique objects) for internal nodes"
+    frontier = util.Queue()
+    internal = []
+    "initialize the search graph using the initial state of problem"
+    frontier.push((problem.getStartState(), [])) 
+    "graph-search(problem, strategy) returns a solution, or failure"
+    while not frontier.isEmpty():
+        "choose a frontier node for expansion according to strategy"
+        pos = frontier.pop()
+        node = pos[0]
+        path = pos[1]
+        "if the node contains a goal state then return the corresponding solution"
+        if problem.isGoalState(node):
+            return path
+        "else expand the node and add the resulting nodes to the search tree"
+        if node not in internal:
+            internal.append(node)
+            # get each new frontier node and push them onto the queue as a tuple of the node and path to said node
+            for newfrontier in problem.getSuccessors(node):
+                if newfrontier not in internal:
+                    nfnode = newfrontier[0]
+                    cpath = path + [newfrontier[1]]
+                    frontier.push((nfnode, cpath))  
+    "if there are no candidates for expansion then return failure"
+    print("Failure! BFS could not find a goal!")
+    return[]
 
 def uniformCostSearch(problem: SearchProblem):
     """Search the node of least total cost first."""
     "*** YOUR CODE HERE ***"
     
-    # call chooseSearch to perform UCS, return the path
-    return(chooseSearch(2, problem, None))
+    """The overarching structure of this code for UCS remains the same as DFS and BFS, but with
+       a handful of significant changes. First, frontier has now become a PriorityQueue data structure
+       in place of a Stack or Queue, owing to UCS' focus on uniform priority popping of queue notes.
+       Second, the start state has been given a priority of 0 for its initial push, complying with
+       PriorityQueue syntax. Third, nodes are now popped from frontier based off the lowest priority,
+       while storing said priority for use in calculating the priority of new frontier nodes. Fourth,
+       the same field is stored for each new frontier node, separate from the previously mentioned
+       priority. Finally, each node pushed now stores a tuple of the node, its cumulative path, and
+       its cumulative cost, while storing said cumulative cost redundantly in a second field outside
+       the tuple for priorityqueue popping. This tuple is used in the next iteration of the while loop
+       for whichever node is popped. As far as handling costs priority for which to pop next, that entire
+       process is automated by the priorityqueue data structure itself via a chosen popping of the element
+       with the lowest priority."""
+
+    "initialize stack (LIFO) for expandable nodes and set (unique objects) for internal nodes"
+    frontier = util.PriorityQueue()
+    internal = []
+    "initialize the search graph using the initial state of problem"
+    frontier.push((problem.getStartState(), [], 0), 0) # start node is priority 0, already visited 
+    "graph-search(problem, strategy) returns a solution, or failure"
+    while not frontier.isEmpty():
+        "choose a frontier node for expansion according to strategy"
+        pos = frontier.pop() # pop nodes based on their priority
+        node = pos[0]
+        path = pos[1]
+        prio = pos[2]
+        "if the node contains a goal state then return the corresponding solution"
+        if problem.isGoalState(node):
+            return path
+        "else expand the node and add the resulting nodes to the search tree"
+        if node not in internal:
+            internal.append(node)
+            for newfrontier in problem.getSuccessors(node):
+                if newfrontier not in internal:
+                    nfnode = newfrontier[0]
+                    cpath = path + [newfrontier[1]]
+                    cprio = newfrontier[2] + prio
+                    frontier.push((nfnode, cpath, cprio), cprio)
+    "if there are no candidates for expansion then return failure"
+    print("Failure! UCS could not find a goal!")
+    return[]
+
+def nullHeuristic(state, problem=None):
+    """
+    A heuristic function estimates the cost from the current state to the nearest
+    goal in the provided SearchProblem.  This heuristic is trivial.
+    """
+    return 0
 
 def aStarSearch(problem: SearchProblem, heuristic=nullHeuristic):
     """Search the node that has the lowest combined cost and heuristic first."""
     "*** YOUR CODE HERE ***"
     
-    # call chooseSearch to perform A*, return the path
-    return(chooseSearch(3, problem, heuristic))
+    """The structure of this code most closely aligns with the previous UCS function, but there
+       is a single key difference in the heuristic calculation being appended to the priority of
+       newly pushed nodes in each iteration. This is the only thing that functionally separates
+       A* from UCS as a coded algorithm."""
+    
+    "initialize stack (LIFO) for expandable nodes and set (unique objects) for internal nodes"
+    frontier = util.PriorityQueue()
+    internal = []
+    "initialize the search graph using the initial state of problem"
+    frontier.push((problem.getStartState(), [], 0), 0) # start node is priority 0, already visited 
+    "graph-search(problem, strategy) returns a solution, or failure"
+    while not frontier.isEmpty():
+        "choose a frontier node for expansion according to strategy"
+        pos = frontier.pop() # pop nodes based on their priority
+        node = pos[0]
+        path = pos[1]
+        prio = pos[2]
+        "if the node contains a goal state then return the corresponding solution"
+        if problem.isGoalState(node):
+            return path
+        "else expand the node and add the resulting nodes to the search tree"
+        if node not in internal:
+            internal.append(node)
+            for newfrontier in problem.getSuccessors(node):
+                if newfrontier not in internal:
+                    nfnode = newfrontier[0]
+                    cpath = path + [newfrontier[1]]
+                    cprio = newfrontier[2] + prio
+                    #print(heuristic(nfnode, problem))
+                    frontier.push((nfnode, cpath, cprio), cprio + heuristic(nfnode, problem))
+    "if there are no candidates for expansion then return failure"
+    print("Failure! A* could not find a goal!")
+    return[]
     
 
 
