@@ -14,23 +14,23 @@ Question 3.1: What cost function did you implement?  Please briefly describe how
 A3.1: We implemented a cost function that counts the cumulative cost from the start node to the goal node. It's built around PriorityQueue, which is a queue that also includes a field for each entry detailing the priority said entry has. At each iteration of the loop, the cumulative cost of the path to the current internal node and the path of each new frontier node is calculated, which is stored in each frontier node. This is all taken care of at the end of an iteration, but at the beginning of the next iteration, the priority queue automatically selects the lowest priority node to be popped next. With UCS lacking any usage of heuristics, there's no need to give any weights to the cost.
 
 Question 4.1: What is the difference between the nullHeuristic and the Manhattan distance heuristic? Does nullHeuristic give the optimal solution?  Why is the Manhattan distance heuristic better?
-A4.1: nullHeuristic always returns zero, essentially implying that every node is equal in distance from the goal and thus being the same as UCS for all intents and purposes. On the other hand, the Manhattan distance is the combination of the horizontal and vertical distances of a node from the goal. nullHeuristic DOES give an optimal solution by way of being UCS, but the Manhattan distance is a better heuristic because it can propel the efficiency of its search forward using knowledge about the state space instead of arbitrary zeroes.
+A4.1: nullHeuristic always returns zero, essentially implying that every node is equal in distance from the goal and thus being the same as UCS. On the other hand, the Manhattan distance is the combination of the horizontal and vertical distances of a node from the goal. nullHeuristic DOES give an optimal solution by way of being UCS, but the Manhattan distance is a better heuristic because it can propel the efficiency of its search forward using knowledge about the state space instead of arbitrary zeroes.
 
 Question 4.2: What happens on openMaze for the various search strategies?
 A4.2: DFS exhaustively combs through the maze horizontally row by row before eventually finding the solution. BFS hugs corners and generally finds the solution much faster than BFS. UCS and A* both turn around corners at optimal times to find the solution at the same time as one another but collectively faster than DFS or BFS.
 
 Question 5.1: What states representation do you choose in this problem?
-A5.1: 
+A5.1: We used Pac-Mans starting position, as well as the four corners to be our initial start state. The walls have nothing to do with getting to the goal, nor do we care about anything else except when Pac-Man is on one of the four coordinates indicative of a corner. We start this information in a tuple.
 
 Question 5.2: Briefly  explain your implementation.
-A5.2: 
+A5.2: Most of this is based on FoodSearchProblem which was already implemented. The part I did change was how we calculate the next gameState which will get sent back to the search function. We essentially are removing any corner that is found by the bfs, this is done by the toVisit tuple (ensure make copies of state[1] and DO NOT work using it iterable. I spent 3-4 hours trying to fix a bug caused by that :c). If the corner is found within the current state[1] list, we remove it and pass the remaining x states back to the bfs. This will continue until the state[1] tuple gets sent to isGoalState() empty.
 
 Question 6.1: What heuristic did you use for this corner problem?  Explain the potential strong points and weak points of your chosen heuristic.  Is your heuristic consistent? Why?
-A6.1: 
+A6.1: We used the Manhattan distance for our heuristic. It is a good all-around heuristic that while not directly accounting for the walls, can still calculate a distance which will be efficient enough to solve the maze problem.
 
 Question 7.1: What heuristic did you use for this problem?  Explain the potential strong points and weak points of your chosen heuristic.  Is your heuristic consistent?  Why?
-A7.1: 
+A7.1: I also used Manhattan distance for this problem for the same reason as before, however, we are 551 nodes short of reaching the 4/4, if this sentence is still here it means we couldn't think of a better way to do this. Perhaps implementing a bfs or dfs to search for nodes and use that as a heuristic...
 
 Question 8.1: Describe your solution and explain the potential strong points and weak points of your solution.
-A8.1: 
+A8.1: bfs finds the closest dots and the same level that Pac-Man is on, and accounts for walls. This will always result in us going to the closest food from us.
 
